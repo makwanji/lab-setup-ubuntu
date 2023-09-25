@@ -23,12 +23,18 @@ Welcome to the "Training Institute Lab Setup on Ubuntu" GitHub repository! This 
 To get started with setting up your training lab on Ubuntu, simply clone this repository and follow the provided guides. Whether you need a lab for software development, cybersecurity, data science, or any other discipline, we've got you covered. Start your journey towards creating an effective and efficient training environment today! 🚀🔧
 
 ```
+# 0. Install ansible & git
+sudo apt install ansible git -y
+
 cd ~/code
 git clone https://github.com/makwanji/lab-setup-ubuntu.git
 cd lab-setup-ubuntu
 
-# 1st time when you create user
-ansible-playbook -i 192.168.2.176, create_user.yml
+#create & change user
+sudo useradd -m -d /home/ansible ansible && echo "ansible ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && sudo su - ansible
+
+#copy ssh key
+mkdir .ssh && touch .ssh/authorized_keys
 
 # Create inventory
 # 1. Update inventory file with all the pc in lab
@@ -41,11 +47,9 @@ ansible-playbook lab-setup.yml -u ansible -i inventory.ini
 
 # Server setup
 ansible-playbook server-setup.yml -u ansible -i inventory.ini
-
 ```
 
 ## Contributions
-
 We welcome contributions from the open-source community. If you have improvements, additional scripts, or suggestions to enhance the training lab setup, please feel free to submit a pull request. Together, we can make this repository even more valuable for training institutes and learners worldwide. 🙌🌍
 
 Empower your training programs and learners with a well-organized and efficient lab environment. Explore our "Training Institute Lab Setup on Ubuntu" repository today! 🎓👩‍💻👨‍💻
