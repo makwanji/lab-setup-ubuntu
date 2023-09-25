@@ -1,0 +1,28 @@
+---
+- name: Create and configure a new user
+  hosts: all
+  vars:
+    - user_name: ansible
+    - user_password: ansible
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Create a new user
+      ansible.builtin.user:
+        name: "{{ user_name }}"
+        password: "{{ user_password | password_hash('sha512') }}"
+        shell: /bin/bash
+        groups: sudo
+        state: present
+
+    - name: Add user to sudoers file
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        create: yes
+        line: "{{ user_name }} ALL=(ALL) NOPASSWD:ALL"
+
+    - name: Copy SSH public key to the user's authorized_keys
+      authorized_key:
+        user: "{{ user_name }}"
+        key: "{{ lookup('file', './keys/jig.pub') }}"
