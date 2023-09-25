@@ -30,8 +30,14 @@ cd lab-setup-ubuntu
 # 1st time when you create user
 ansible-playbook -i 192.168.2.176, create_user.yml
 
-# run this script after updating IP address in your inventory.ini file
+# Lab setup
+# 1. Update inventory file with all the pc in lab
+# 2. Run this script
 ansible-playbook lab-setup.yml -u ansible -i inventory.ini
+
+# Server setup
+ansible-playbook server-setup.yml -u ansible -i inventory.ini
+
 ```
 
 ## Contributions

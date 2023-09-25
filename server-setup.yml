@@ -1,0 +1,75 @@
+---
+- name: Server Setup
+  hosts: server
+  become: yes
+  become_method: sudo
+  tasks:
+    - name: Update apt-get repo and cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+        force_apt_get: yes
+
+    - name: Upgrade all apt packages
+      apt:
+        upgrade: dist
+        force_apt_get: yes
+
+    - name: Setup Language package
+      shell: locale-gen en_US.UTF-8
+
+    - name: Install aptitude
+      apt:
+        name: aptitude
+        state: latest
+        update_cache: true
+
+    - name: Install required system packages
+      apt:
+        pkg:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
+        state: latest
+        update_cache: true
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: true
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+    - name: Add remote "ubuntu" user to "docker" group
+      user:
+        name: ansible
+        group: docker
+        append: yes
+
+    # install docker-compose 2.22.0 version, but you can specify the version you need & apply executable permissions to the binary
+    - name: install docker-compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.22.0/docker-compose-{{ ansible_system }}-{{ ansible_userspace_architecture }}
+        dest: /usr/local/bin/docker-compose
+        mode: 'u+x,g+x'
+
+    # you can also create a symbolic link to /usr/bin or any other directory in your path
+    - name: Create symlink
+      file: src=/usr/local/bin/docker-compose dest=/usr/bin/docker-compose state=link
